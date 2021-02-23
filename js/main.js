@@ -1,69 +1,94 @@
 function capitalize(str){
     return (str === null || str.length === 0) ? str : str[0].toUpperCase() + str.slice(1);
   }
-
   
+function initialIsLower( word ){
+  return /[a-z]/.test(word.charAt(0))
+}
 
 $(document).ready(() => {
 
-    $('#step1').hide();
-
     const pint = 'https://susepubliccloudinfo.suse.com/v1/';
+    var pintProvider = pint + 'providers.json'
 
-    /** Populate the provider dropdown with the CSP's */
-    providerDropdown = $('#provider-dropdown');
+    var providerDropdown = $('#provider-dropdown');
+    var regionDropdown = $('#region-dropdown');
+    var regionServerContent = $('#region-servers');
+    var rmtServerContent = $('#rmt-servers');
+    var rmtServerContent2 = $('#rmt-servers-2');
+
+    /** Initialize when the page first loads*/
     providerDropdown.empty();
     providerDropdown.append('<option selected="true" disabled>Choose Provider</option>');
-    providerDropdown.prop('selectedIndex', 0);
+    regionDropdown.empty();
+    regionDropdown.append('<option selected="true" disabled>Choose Region</option>');
 
-    pintProvider = pint + 'providers.json'
+
 
     $.getJSON(pintProvider, (providerData) => {
       $.each(providerData.providers, function (index, provider) {
-        providerDropdown.append($('<option></option>').attr('value', provider.name).text(capitalize(provider.name)));
+        /** Exclude oracle and alibaba. They don't have managed update infrastructure */
+        if ((provider.name != "oracle") && (provider.name != "alibaba")) {
+          providerDropdown.append($('<option></option>').attr('value', provider.name).text(capitalize(provider.name)));
+        }
       });
     });
     
-      /** Populate the region dropdown with the CSP regions */
-    regionDropdown = $('#region-dropdown');
-    regionServerContent = $('#region-servers');
-    regionDropdown.empty();
     regionServerContent.empty();
-    regionDropdown.append('<option selected="true" disabled>Choose Region</option>');
+    
+    var stepOne = function() {
+      regionServerContent.empty();
+      $('#step2').hide();
+      $('#step3').hide();
+      $('#button-2').removeClass('active');
+      $('#button-3').removeClass('active');
 
-    rmtServerContent = $('#rmt-servers');
+      $('#step1').show();
+      $('#button-1').addClass('active');
 
+      var pintRegionServers = pint + provider + '/servers/regionserver.json'
 
-    $('#provider-dropdown').change(function() {
-        regionDropdown.empty();
-        regionServerContent.empty();
-        $('#button-1').removeClass('active');
-        $('#button-2').removeClass('active');
-        $('#button-3').removeClass('active');
-
-        provider = $('#provider-dropdown').val();
-
-        pintRegion = pint + provider + '/regions.json'
-        pintRegionServers = pint + provider + '/servers/regionserver.json'
-
-        $.getJSON(pintRegion, function (regionData) {
-          $.each(regionData.regions, function (index, region) {
-            regionDropdown.append($('<option></option>').attr('value', region.name).text(region.name));
-          });
+      $.getJSON(pintRegionServers, function (regionServerData) {
+        $.each(regionServerData.servers, function(index, regionServer) {
+          regionServerContent.append($('<div></div>').attr('value', regionServer.ip).text(regionServer.ip));
         });
+      });
+    }
 
-        $('#step1').show();
-        $('#button-1').addClass('active');
+    /** When provider dropdown changes */
+    $('#provider-dropdown').change(function() {
+      regionDropdown.empty();
+      regionServerContent.empty();
+      $('#step1').hide();
+      $('#step2').hide();
+      $('#step3').hide();
+      $('#button-1').removeClass('active');
+      $('#button-2').removeClass('active');
+      $('#button-3').removeClass('active');
 
-        $.getJSON(pintRegionServers, function (regionServerData) {
-          $.each(regionServerData.servers, function(index, regionServer) {
-            regionServerContent.append($('<div></div>').attr('value', regionServer.ip).text(regionServer.ip));
-          });
+      /** Get the current provider */
+      provider = $('#provider-dropdown').val();
+
+      var pintRegion = pint + provider + '/regions.json'
+
+      /** Get list of regions for provider */
+      $.getJSON(pintRegion, function (regionData) {
+        $.each(regionData.regions, function (index, region) {
+          if (initialIsLower(region.name)) {
+            regionDropdown.append($('<option></option>').attr('value', region.name).text(region.name));
+          }
         });
       });
 
+      stepOne();
+  
+      });
+
+    /** If Step 2 button is pushed */
     $('#button-2').on('click', () => {
       rmtServerContent.empty();
+      rmtServerContent2.empty();
+      regionServerContent.empty();
       $('#step1').hide();
       $('#button-1').removeClass('active');
       $('#button-2').addClass('active');
@@ -74,10 +99,31 @@ $(document).ready(() => {
         $.each(rmtServerData.servers, function(index, rmtServer) {
           if (rmtServer.region == currentRegion) {
             rmtServerContent.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
+            rmtServerContent2.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
           }
         });
       });
+    });
 
+    /** If the region dropdown changes */
+    $('#region-dropdown').change(function() {
+      rmtServerContent.empty();
+      rmtServerContent2.empty();
+      pintRMTServers = pint + provider + '/servers/smt.json'
+      currentRegion = $('#region-dropdown').val();
+      $.getJSON(pintRMTServers, function (rmtServerData) {
+        $.each(rmtServerData.servers, function(index, rmtServer) {
+          if (rmtServer.region == currentRegion) {
+            rmtServerContent.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
+            rmtServerContent2.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
+          }
+        });
+      });
+    });
+
+
+    $('#button-1').on('click', () => {
+      stepOne();
     });
 
 });
