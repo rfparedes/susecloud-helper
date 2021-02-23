@@ -7,7 +7,7 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://www.suse.com/min/?b=assets/css&f=bootstrap.css,main.css,iefix.css">
+    <!-- <link rel="stylesheet" href="https://www.suse.com/min/?b=assets/css&f=bootstrap.css,main.css,iefix.css"> -->
     <link rel="stylesheet" href="assets/css/jquery-steps.css">
 
     <title>SUSE PAYG Repository Setup Helper</title>
@@ -65,15 +65,33 @@
           If <mark>httpsOnly = true</mark>, then you are finished with this step.<br><br>
           If <mark>httpsOnly = true</mark> is missing or <mark>httpsOnly = false</mark> then open HTTP TCP Port 80 to the following update server IPs:</p>
           <div id="rmt-servers-2"></div>
-
-
-          
-          </p>
           <h3 class="mt-4 mb-2"><u>Learn More But Not Required</u></h3>
-         
+          <p>Once an instance has the update server IP addresses, it will communicate with all of the update servers to see which responds first.
+             The update server that responds first is selected, and a host record is added to /etc/hosts, resolving smt-&lt;PROVIDER&gt;.susecloud.net to the selected update server’s IP address.
+             This record is added locally because it will not be publicly resolvable.</p>
+          <p>After the host record is added,  the instance will import the certificate from the update server into /usr/share/pki/trust/anchors and then run update-ca-certificates.
+             This certificate will then be used to create an encrypted session between the instance and the update server.</p>
+          <p>Finally, if all communication passes and there are no unexpected issues, the registration completes with all repositories being made available to the instance.</p>
         </div>
         <div class="step-tab-panel" data-step="step3" id="step3">
-          ...
+          <h2 class="mt-2 mb-4">Proxy Server Considerations</h2> 
+          <p>Instances configured to utilize a proxy server or traverse firewalls, NAT gateways, proxies, security rules, Zscalar, or other security and network devices may run into problems.</p>
+          <p>The instance communicates with the region server (Step 1) using certificates local to the instance located in /var/lib/regionService/certs. 
+             This is when customers typically run into problems with a MITM (man-in-the-middle) proxy, Zscalar, or similar device. These MITM devices intercept
+             the TLS traffic between the instance and the region server and instead utilize a trusted MITM certificate between the proxy and the instance. 
+             This MITM certificate is unknown to the region servers. As a result, the connection to the region server is terminated before the instance acquires
+             the required information to continue the registration.</p>
+          <p>The instance communicates with the update server (Step 2) using certificates imported from the update server to /usr/share/pki/trust/anchors.
+             This certificate will then be used to create an encrypted session between the instance and the update server.  Once again, this is when customers 
+             run into problems with a MITM proxy or similar device.  The certificate from the update servers cannot be intercepted and replaced or the session will fail.</p>
+          <p>The update infrastructure is designed using certificate pinning.  This will cause problems with MITM devices that intercept the pinned certificates and replace
+             them with their own. The MITM device will need to exempt the update infrastructure IPs from SSL inspection to prevent these problems.</p>
+          <p>To accommodate the SUSE public cloud update infrastructure:<br>
+            <b>1. Exempt all region server IPs obtained in Step 1 from SSL inspection.</b><br>
+            <b>2. Exempt all update servers IPs obtained in Step 2 from SSL inspection.</b><br>
+            <b>3. Exempt <mark id="hosts-record"></mark> from SSL inspection</b>
+          <h2 class="mt-2 mb-4">Metadata Server Considerations</h2>
+          <p>The registration process all depends on the metadata server at 169.254.169.254 being available.  This address should be excluded from being proxied.</p>
         </div>
       </div>
     </div>

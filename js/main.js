@@ -8,6 +8,7 @@ function initialIsLower( word ){
 
 $(document).ready(() => {
 
+    $('#button-1').prop('disabled', true);
     const pint = 'https://susepubliccloudinfo.suse.com/v1/';
     var pintProvider = pint + 'providers.json'
 
@@ -23,8 +24,6 @@ $(document).ready(() => {
     regionDropdown.empty();
     regionDropdown.append('<option selected="true" disabled>Choose Region</option>');
 
-
-
     $.getJSON(pintProvider, (providerData) => {
       $.each(providerData.providers, function (index, provider) {
         /** Exclude oracle and alibaba. They don't have managed update infrastructure */
@@ -33,7 +32,7 @@ $(document).ready(() => {
         }
       });
     });
-    
+  
     regionServerContent.empty();
     
     var stepOne = function() {
@@ -54,7 +53,6 @@ $(document).ready(() => {
         });
       });
     }
-
     /** When provider dropdown changes */
     $('#provider-dropdown').change(function() {
       regionDropdown.empty();
@@ -79,30 +77,57 @@ $(document).ready(() => {
           }
         });
       });
-
+      
       stepOne();
   
       });
 
     /** If Step 2 button is pushed */
     $('#button-2').on('click', () => {
-      rmtServerContent.empty();
-      rmtServerContent2.empty();
-      regionServerContent.empty();
-      $('#step1').hide();
-      $('#button-1').removeClass('active');
-      $('#button-2').addClass('active');
-      $('#step2').show()
-      pintRMTServers = pint + provider + '/servers/smt.json'
-      currentRegion = $('#region-dropdown').val();
-      $.getJSON(pintRMTServers, function (rmtServerData) {
-        $.each(rmtServerData.servers, function(index, rmtServer) {
-          if (rmtServer.region == currentRegion) {
-            rmtServerContent.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
-            rmtServerContent2.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
-          }
+      if (provider) {
+        rmtServerContent.empty();
+        rmtServerContent2.empty();
+        regionServerContent.empty();
+        $('#step1').hide();
+        $('#step3').hide();
+        $('#button-1').removeClass('active');
+        $('#button-3').removeClass('active');
+        $('#button-2').addClass('active');
+        $('#step2').show()
+        pintRMTServers = pint + provider + '/servers/smt.json'
+        currentRegion = $('#region-dropdown').val();
+        $.getJSON(pintRMTServers, function (rmtServerData) {
+          $.each(rmtServerData.servers, function(index, rmtServer) {
+            if (rmtServer.region == currentRegion) {
+              rmtServerContent.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
+              rmtServerContent2.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
+            }
+          });
         });
-      });
+      }
+    });
+
+    $('#button-3').on('click', () => {
+      if (provider) {    
+        $('#step1').hide();
+        $('#step2').hide();
+        $('#button-1').removeClass('active');
+        $('#button-2').removeClass('active');
+        $('#button-3').addClass('active');
+        $('#hosts-record').empty();
+        $('#step3').show()
+
+        if (provider == "amazon") {
+          record = "smt-ec2.susecloud.net";
+        }
+        else if (provider == "google") {
+          record = "smt-gce.susecloud.net";
+        }
+        else if (provider == "microsoft") {
+          record = "smt-azure.susecloud.net"
+        }
+        $('#hosts-record').append(record);
+      }
     });
 
     /** If the region dropdown changes */
@@ -123,7 +148,10 @@ $(document).ready(() => {
 
 
     $('#button-1').on('click', () => {
-      stepOne();
+      if (provider) {
+        stepOne();
+      }
+
     });
 
 });
