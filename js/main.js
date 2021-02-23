@@ -37,6 +37,7 @@ $(document).ready(() => {
     
     var stepOne = function() {
       regionServerContent.empty();
+      $('.footer').empty();
       $('#step2').hide();
       $('#step3').hide();
       $('#button-2').removeClass('active');
@@ -45,6 +46,7 @@ $(document).ready(() => {
       $('#step1').show();
       $('#button-1').addClass('active');
 
+
       var pintRegionServers = pint + provider + '/servers/regionserver.json'
 
       $.getJSON(pintRegionServers, function (regionServerData) {
@@ -52,6 +54,8 @@ $(document).ready(() => {
           regionServerContent.append($('<div></div>').attr('value', regionServer.ip).text(regionServer.ip));
         });
       });
+
+      $('.footer').append("<div id='footernav'></div>");
     }
     /** When provider dropdown changes */
     $('#provider-dropdown').change(function() {
@@ -77,7 +81,7 @@ $(document).ready(() => {
           }
         });
       });
-      
+
       stepOne();
   
       });
@@ -155,13 +159,3 @@ $(document).ready(() => {
     });
 
 });
-
-  /**
-  * load servers from the public cloud service, leveraging the type,
-  * and the currently selected csp
-  *
-  * example urls: https://susepubliccloudinfo.suse.com/v1/oracle/servers/smt.xml
-  *               https://susepubliccloudinfo.suse.com/v1/amazon/servers/regionserver.xml
-  */
-
-
