@@ -40,8 +40,10 @@ $(document).ready(() => {
       $('.footer').empty();
       $('#step2').hide();
       $('#step3').hide();
+      $('#step4').hide();
       $('#button-2').removeClass('active');
       $('#button-3').removeClass('active');
+      $('#button-4').removeClass('active');
 
       $('#step1').show();
       $('#button-1').addClass('active');
@@ -64,9 +66,11 @@ $(document).ready(() => {
       $('#step1').hide();
       $('#step2').hide();
       $('#step3').hide();
+      $('#step4').hide();
       $('#button-1').removeClass('active');
       $('#button-2').removeClass('active');
       $('#button-3').removeClass('active');
+      $('#button-4').removeClass('active');
 
       /** Get the current provider */
       provider = $('#provider-dropdown').val();
@@ -93,9 +97,11 @@ $(document).ready(() => {
         rmtServerContent2.empty();
         regionServerContent.empty();
         $('#step1').hide();
+        $('#step4').hide();
         $('#step3').hide();
         $('#button-1').removeClass('active');
         $('#button-3').removeClass('active');
+        $('#button-4').removeClass('active');
         $('#button-2').addClass('active');
         $('#step2').show()
         pintRMTServers = pint + provider + '/servers/smt.json'
@@ -115,8 +121,10 @@ $(document).ready(() => {
       if (provider) {    
         $('#step1').hide();
         $('#step2').hide();
+        $('#step4').hide();
         $('#button-1').removeClass('active');
         $('#button-2').removeClass('active');
+        $('#button-4').removeClass('active');
         $('#button-3').addClass('active');
         $('#hosts-record').empty();
         $('#step3').show()
@@ -131,6 +139,19 @@ $(document).ready(() => {
           record = "smt-azure.susecloud.net"
         }
         $('#hosts-record').append(record);
+      }
+    });
+
+    $('#button-4').on('click', () => {
+      if (provider) {    
+        $('#step1').hide();
+        $('#step2').hide();
+        $('#step3').hide();
+        $('#button-1').removeClass('active');
+        $('#button-2').removeClass('active');
+        $('#button-3').removeClass('active');
+        $('#button-4').addClass('active');
+        $('#step4').show()
       }
     });
 
