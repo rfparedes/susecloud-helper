@@ -78,7 +78,7 @@ $(document).ready(() => {
       var pintRegion = pint + provider + '/regions.json'
 
       /** Get RMT Servers for provider and region */
-      var getRmtServers = function() {
+      var getRmtServers = function(currentRegion) {
         rmtServerContent.empty();
         rmtServerContent2.empty();
         pintRMTServers = pint + provider + '/servers/smt.json'
@@ -127,7 +127,7 @@ $(document).ready(() => {
         $('#step2').show()
         pintRMTServers = pint + provider + '/servers/smt.json'
         currentRegion = $('#region-dropdown').val();
-        getRmtServers();
+        getRmtServers(currentRegion);
       }
     });
 
@@ -171,7 +171,7 @@ $(document).ready(() => {
 
     /** If the region dropdown changes */
     $('#region-dropdown').change(function() {
-      getRmtServers();
+      getRmtServers(currentRegion);
     });
 
 
