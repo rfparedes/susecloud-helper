@@ -78,7 +78,7 @@ $(document).ready(() => {
       var pintRegion = pint + provider + '/regions.json'
 
       /** Get RMT Servers for provider and region */
-      var getRmtServers = function(currentRegion) {
+      function getRmtServers(currentRegion) {
         rmtServerContent.empty();
         rmtServerContent2.empty();
         pintRMTServers = pint + provider + '/servers/smt.json'
