@@ -77,33 +77,10 @@ $(document).ready(() => {
 
       var pintRegion = pint + provider + '/regions.json'
 
-      /** Get list of regions for provider */
-      $.getJSON(pintRegion, function (regionData) {
-        $.each(regionData.regions, function (index, region) {
-          if (initialIsLower(region.name)) {
-            regionDropdown.append($('<option></option>').attr('value', region.name).text(region.name));
-          }
-        });
-      });
-
-      stepOne();
-  
-      });
-
-    /** If Step 2 button is pushed */
-    $('#button-2').on('click', () => {
-      if (provider) {
+      /** Get RMT Servers for provider and region */
+      var getRmtServers = function() {
         rmtServerContent.empty();
         rmtServerContent2.empty();
-        regionServerContent.empty();
-        $('#step1').hide();
-        $('#step4').hide();
-        $('#step3').hide();
-        $('#button-1').removeClass('active');
-        $('#button-3').removeClass('active');
-        $('#button-4').removeClass('active');
-        $('#button-2').addClass('active');
-        $('#step2').show()
         pintRMTServers = pint + provider + '/servers/smt.json'
         currentRegion = $('#region-dropdown').val();
         $.getJSON(pintRMTServers, function (rmtServerData) {
@@ -120,6 +97,38 @@ $(document).ready(() => {
             rmtServerContent2.append($('<div></div>').attr('value', "").text("No Update Servers in this region"));
           }
         });
+      }
+
+      /** Get list of regions for provider */
+      $.getJSON(pintRegion, function (regionData) {
+        $.each(regionData.regions, function (index, region) {
+          if (initialIsLower(region.name)) {
+            regionDropdown.append($('<option></option>').attr('value', region.name).text(region.name));
+          }
+        });
+      });
+
+      stepOne();
+  
+      });
+
+    /** If Step 2 button is pushed */
+    $('#button-2').on('click', () => {
+      if (provider) {
+        //rmtServerContent.empty();
+        //rmtServerContent2.empty();
+        regionServerContent.empty();
+        $('#step1').hide();
+        $('#step4').hide();
+        $('#step3').hide();
+        $('#button-1').removeClass('active');
+        $('#button-3').removeClass('active');
+        $('#button-4').removeClass('active');
+        $('#button-2').addClass('active');
+        $('#step2').show()
+        pintRMTServers = pint + provider + '/servers/smt.json'
+        currentRegion = $('#region-dropdown').val();
+        getRmtServers();
       }
     });
 
@@ -163,18 +172,7 @@ $(document).ready(() => {
 
     /** If the region dropdown changes */
     $('#region-dropdown').change(function() {
-      rmtServerContent.empty();
-      rmtServerContent2.empty();
-      pintRMTServers = pint + provider + '/servers/smt.json'
-      currentRegion = $('#region-dropdown').val();
-      $.getJSON(pintRMTServers, function (rmtServerData) {
-        $.each(rmtServerData.servers, function(index, rmtServer) {
-          if (rmtServer.region == currentRegion) {
-            rmtServerContent.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
-            rmtServerContent2.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
-          }
-        });
-      });
+      getRmtServers();
     });
 
 
