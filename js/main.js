@@ -107,12 +107,18 @@ $(document).ready(() => {
         pintRMTServers = pint + provider + '/servers/smt.json'
         currentRegion = $('#region-dropdown').val();
         $.getJSON(pintRMTServers, function (rmtServerData) {
-          $.each(rmtServerData.servers, function(index, rmtServer) {
-            if (rmtServer.region == currentRegion) {
-              rmtServerContent.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
-              rmtServerContent2.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
-            }
-          });
+          if (rmtServerData.length) {
+            $.each(rmtServerData.servers, function(index, rmtServer) {
+              if (rmtServer.region == currentRegion) {
+                rmtServerContent.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
+                rmtServerContent2.append($('<div></div>').attr('value', rmtServer.ip).text(rmtServer.ip));
+              }
+            });
+          }
+          else {
+            rmtServerContent.append($('<div></div>').attr('value', rmtServer.ip).text("No Update Servers in this region"));
+            rmtServerContent2.append($('<div></div>').attr('value', rmtServer.ip).text("No Update Servers in this region"));
+          }
         });
       }
     });
