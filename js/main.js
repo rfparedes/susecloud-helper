@@ -115,8 +115,8 @@ $(document).ready(() => {
     /** If Step 2 button is pushed */
     $('#button-2').on('click', () => {
       if (provider) {
-        //rmtServerContent.empty();
-        //rmtServerContent2.empty();
+        rmtServerContent.empty();
+        rmtServerContent2.empty();
         regionServerContent.empty();
         $('#step1').hide();
         $('#step4').hide();
