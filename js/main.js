@@ -82,7 +82,6 @@ $(document).ready(() => {
         rmtServerContent.empty();
         rmtServerContent2.empty();
         pintRMTServers = pint + provider + '/servers/smt.json'
-        currentRegion = $('#region-dropdown').val();
         $.getJSON(pintRMTServers, function (rmtServerData) {
           if (rmtServerData.length) {
             $.each(rmtServerData.servers, function(index, rmtServer) {
@@ -115,8 +114,8 @@ $(document).ready(() => {
     /** If Step 2 button is pushed */
     $('#button-2').on('click', () => {
       if (provider) {
-        rmtServerContent.empty();
-        rmtServerContent2.empty();
+        //rmtServerContent.empty();
+        //rmtServerContent2.empty();
         regionServerContent.empty();
         $('#step1').hide();
         $('#step4').hide();
