@@ -171,6 +171,7 @@ $(document).ready(() => {
 
     /** If the region dropdown changes */
     $('#region-dropdown').change(function() {
+      currentRegion = $('#region-dropdown').val();
       getRmtServers(currentRegion);
     });
 
