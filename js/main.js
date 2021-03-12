@@ -116,8 +116,8 @@ $(document).ready(() => {
             });
           }
           else {
-            rmtServerContent.append($('<div></div>').attr('value', rmtServer.ip).text("No Update Servers in this region"));
-            rmtServerContent2.append($('<div></div>').attr('value', rmtServer.ip).text("No Update Servers in this region"));
+            rmtServerContent.append($('<div></div>').attr('value', "").text("No Update Servers in this region"));
+            rmtServerContent2.append($('<div></div>').attr('value', "").text("No Update Servers in this region"));
           }
         });
       }
